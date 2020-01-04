@@ -457,6 +457,7 @@ namespace Config {
 			int desync;
 			int angle;
 			int desync_flip = -1;
+			int desync2;
 
 		};
 		class AAFakelag : public singleton< AAFakelag > {
@@ -523,6 +524,7 @@ namespace Config {
 		class Knifes : public singleton< Knifes > {
 		public:
 			int knifemodel;
+			int ssg08_skin;
 		};
 		class Model : public singleton< Model > {
 		public:

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ImGui/imgui.h"
+
 
 #define NOCOLOR CColor(0, 0, 0, 0)
 #define WHITE CColor(255, 255, 255, 255)
@@ -174,12 +174,7 @@ public:
 
 	uint8_t _color[4];
 
-	ImU32 GetU32()
-	{
-		return ((_color[3] & 0xff) << 24) + ((_color[2] & 0xff) << 16) + ((_color[1] & 0xff) << 8)
-			+ (_color[0] & 0xff);
-		//return (ImU32)(((_color[3] & 0xff) << 24) + ((_color[0] & 0xff) << 16) + ((_color[1] & 0xff) << 8) + (_color[2] & 0xff));
-	}
+
 	float Hue() const
 	{
 		return Hue(*this);

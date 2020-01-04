@@ -466,6 +466,31 @@ void CAntiAim::do_antiaim(SDK::CUserCmd* cmd) {
 		}
 	}
 
+	switch (Config::AntiAim::AADesync::get().desync2)
+	{
+	case 0: //off desync
+	{
+
+	}
+	break;
+	case 1:
+	{
+		if (global::should_send_packet)
+		{
+			static bool desync_flip = false;
+			desync_flip = !desync_flip;
+
+			cmd->viewangles.y -= 180 + (desync_flip ? -58 : 58);
+
+
+		}
+
+
+	}
+	break;
+
+	}
+
 }
 
 

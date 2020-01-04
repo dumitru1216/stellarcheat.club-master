@@ -1,7 +1,4 @@
 ﻿#include "..\includes.h"
-#include "../ImGui/imgui.h"
-#include "../ImGui/imgui_internal.h"
-#include "../ImGui/dx9/imgui_impl_dx9.h"
 #include "hooks.h"
 #include "../SDK/imdlcache.h"
 #include "../UTILS/interfaces.h"
@@ -1494,7 +1491,7 @@ namespace HOOKS
 						INTERFACES::ModelRender->ForcedMaterialOverride(nullptr);
 					}
 					if (Config::Visuals::Main::Visualschams::get().desync_chams > 0 && !antiaim->ShallReturn(&global::originalCMD)) {
-						if (Config::AntiAim::AADesync::get().desync > 0) {
+						if (Config::AntiAim::AADesync::get().desync > 0 && Config::AntiAim::AADesync::get().desync2 > 0) {
 							desync->Set_Flag(MATERIAL_VAR_WIREFRAME, false);
 							manage_local_fake_animstate(matrix, render_info);
 								INTERFACES::ModelRender->ForcedMaterialOverride(desync);
@@ -1506,7 +1503,7 @@ namespace HOOKS
 									modulate(desync, desync_col, Config::Visuals::Main::Visualschams::get().desync_chams_a / 255, Config::Visuals::Main::Visualschams::get().desync_chams_w);
 								original_draw_model_execute(ecx, context, state, render_info,oldBoneMatrix);
 								INTERFACES::ModelRender->ForcedMaterialOverride(nullptr);
-							}
+						}
 					}
 					if (Config::Legitbot::LegitGlobal::get().show_legit_aa) {
 						matrix3x4_t BoneMatrix[128];

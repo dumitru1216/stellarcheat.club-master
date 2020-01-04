@@ -353,6 +353,41 @@ void Save_Config()
 
 }
 
+void modelchanger_plus()//testing some shit
+{
+	static bool next = false;//bool for [+] define
+
+	if (next == true)//check when button get clicked
+	{
+		Config::SkinChanger::Model::get().model_changer == 1;//move to model numer 1 
+		next == false;//uncheck button[when clicked] // == false [fixing]
+	}
+	else if (next == true)//againg for next model
+	{
+		Config::SkinChanger::Model::get().model_changer == 2;//move to model number 2 
+		next == false;//uncheck button[when clicked]
+	}
+
+}
+
+void modelchanger_minus()//testing some shit#2
+{
+	static bool back = false;//define [-] buttton
+
+	if (back == true)//check when button get click
+	{
+		Config::SkinChanger::Model::get().model_changer == 0;
+		back == false;
+	}
+	else if (back == true)
+	{
+		Config::SkinChanger::Model::get().model_changer == 1;
+		back == false;
+	}
+
+
+}
+
 void Load_Config()
 {
 	Config2->Load(config_slots[save_slot]);
@@ -477,9 +512,45 @@ DWORD FindSignaturenew(const char* szModuleName, const char* PatternName, char* 
 	return ret;
 }
 
-void ForceDaUpdate() {
 
+
+template<class T>
+static T* FindHudElement(const char* name)
+{
+	static auto pThis = *reinterpret_cast<DWORD**> (UTILS::FindSignature("client_panorama.dll", "B9 ? ? ? ? E8 ? ? ? ? 8B 5D 08") + 1); //find element signature
+
+	static auto find_hud_element = reinterpret_cast<DWORD(__thiscall*)(void*, const char*)>(UTILS::FindSignature("client_panorama.dll", "55 8B EC 53 8B 5D 08 56 57 8B F9 33 F6 39 77 28"));
+	return (T*)find_hud_element(pThis, name);
 }
+
+struct hud_weapons_t
+{
+	std::int32_t* get_weapon_count()
+	{
+		return reinterpret_cast<std::int32_t*>(std::uintptr_t(this) + 0x80);
+	}
+};
+
+void KnifeApplyCallbk()
+{
+	static auto clear_hud_weapon_icon_fn = reinterpret_cast<std::int32_t(__thiscall*)(void*, std::int32_t)>(UTILS::FindSignature(("client_panorama.dll"), ("55 8B EC 51 53 56 8B 75 08 8B D9 57 6B FE 2C")));
+
+	auto element = FindHudElement<std::uintptr_t*>(("CCSGO_HudWeaponSelection"));
+
+	auto hud_weapons = reinterpret_cast<hud_weapons_t*>(std::uintptr_t(element) - 0xA0);
+	if (hud_weapons == nullptr)
+		return;
+
+	if (!*hud_weapons->get_weapon_count())
+		return;
+
+	for (std::int32_t i = 0; i < *hud_weapons->get_weapon_count(); i++)
+		i = clear_hud_weapon_icon_fn(hud_weapons, i);
+
+	INTERFACES::Engine->ForceFullUpdate();
+}
+
+
 
 std::string text_uwu;
 bool dont_recieve_input = false;
@@ -1295,8 +1366,9 @@ void Menu::Render()
 		}
 		std::string pitch[5] = {"none", "down", "up", "random", "fake up"};
 		std::string base[2] = { "local view", "at target" };
-		std::string dbase[2] = { "menual", "freestanding" };
+		std::string dbase[2] = { "menual", "beta" };
 		std::string desync[4] = { "none", "static", "jitter", "lby" };
+		std::string desync2[2] = { "none", "180 + jitter" };
 		std::string yaw[5] = { "none", "180z jitter","backwards jitter", "custom jitter", "freestanding" };
 		std::string yawjitter[6] = { "none", "Offset", "Center", "Random" };
 		std::string fakelag[5] = { "none", "passive", "factor", "adaptive", "step" };
@@ -1358,14 +1430,21 @@ void Menu::Render()
 
 
 			groupbox(349, 272, GroupBoxSize_Width * 1.8, GroupBoxSize_Height / 1.8, "Desync");
-			slider(50, "Slowwalk speed", &Config::AntiAim::AAMisc::get().slowwwalk_speed, "units", 0);
-			checkbox("Hide Shots", &Config::AntiAim::AAMisc::get().hide_shots);
-
 			combobox(2, "Desync Base", dbase, &Config::AntiAim::AADesync::get().desyncbase);
-			combobox(4, "Desync", desync, &Config::AntiAim::AADesync::get().desync);
-			if (Config::AntiAim::AADesync::get().desyncbase == 0) {
+			//combobox(2, "Yaw Configure", desync, &Config::AntiAim::AADesync::get().desync);
+			//combobox(4, "Desync", desync, &Config::AntiAim::AADesync::get().desync);
+			if (Config::AntiAim::AADesync::get().desyncbase == 0)
+			{
+				combobox(4, "Desync", desync, &Config::AntiAim::AADesync::get().desync);
 				slider(58, "Angle", &Config::AntiAim::AADesync::get().angle, "°", 0);
 			}
+			if (Config::AntiAim::AADesync::get().desyncbase == 1)
+			{
+				combobox(2, "Yaw Configure", desync2, &Config::AntiAim::AADesync::get().desync);
+			}
+
+			slider(50, "Slowwalk speed", &Config::AntiAim::AAMisc::get().slowwwalk_speed, "units", 0);
+			checkbox("Hide Shots", &Config::AntiAim::AAMisc::get().hide_shots);
 
 		}
 		if (tab_selected == 3)//NONONO, this is Player stuff, dummy, like esp, chams, n glow, smh
@@ -1458,7 +1537,7 @@ void Menu::Render()
 			checkbox("Bomb", &Config::Visuals::Main::Visualsworld::get().Bomb);
 
 			groupbox(30, 312.5, GroupBoxSize_Width * 1.8, GroupBoxSize_Height / 2.1 + 15, "World");
-			checkbox("Granade Warning", &Config::Visuals::Main::Visualsworld::get().GranadeWaring);
+			checkbox("Grenade Warning", &Config::Visuals::Main::Visualsworld::get().GranadeWaring);
 			checkbox("Penetration Crosshair", &Config::Visuals::Main::Visualsworld::get().PenetrationCrosshair);
 			checkbox("Spectators", &Config::Visuals::Main::Visualsworld::get().Spectators);
 			checkbox("Taser Range", &Config::Visuals::Main::Visualsworld::get().VisualizeTaserRange);
@@ -1546,9 +1625,16 @@ void Menu::Render()
 		if (tab_selected == 7) {//Skins
 
 			std::string knives[20] = { " default"," bayonet"," flip knife"," gut knife"," karambit"," m9 bayonet"," huntsman knife"," falchion knife"," bowie knife"," butterfly knife"," shadow daggers"," talon knife"," navaja knife"," stiletto knife"," ursus knife"," cs20 knife", " skeleton knife", " survival kinfe", " paracord knife", " nomad knife"};
+			std::string ssg08_skins[7] = { "default", "dragonfire", "fuschia", "whiteout", "acid fade", "tiger thot", "fade" };
 			groupbox(30, 77, GroupBoxSize_Width * 1.8, GroupBoxSize_Height, "Part 1");
+			button(KnifeApplyCallbk, "update skins");
 			combobox(20, "Knife Model", knives, &Config::SkinChanger::Knifes::get().knifemodel);
-			combobox(26, "Model Changer", model_changer, &Config::SkinChanger::Model::get().model_changer);
+			combobox(6, "SSG08 Skin", ssg08_skins, &Config::SkinChanger::Knifes::get().ssg08_skin);
+			text("isnt finished{model changer}");
+		//	combobox(26, "Model Changer", model_changer, &Config::SkinChanger::Model::get().model_changer);
+
+			button(modelchanger_plus, "+");
+			button(modelchanger_minus, "+");
 		}
 
 		if (tab_selected == 8) {

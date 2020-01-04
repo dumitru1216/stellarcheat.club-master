@@ -29,6 +29,11 @@ namespace SDK
 	class IEngine
 	{
 	public:
+		void ForceFullUpdate()
+		{
+			*reinterpret_cast<int*>(uintptr_t(this) + 0x174) = -1;
+		}
+
 		virtual int                   GetIntersectingSurfaces(const model_t *model, const Vector &vCenter, const float radius, const bool bOnlyVisibleSurfaces, SurfInfo *pInfos, const int nMaxInfos) = 0;
 		virtual Vector                GetLightForPoint(const Vector &pos, bool bClamp) = 0;
 		virtual IMaterial*            TraceLineMaterialAndLighting(const Vector &start, const Vector &end, Vector &diffuseLightColor, Vector& baseColor) = 0;

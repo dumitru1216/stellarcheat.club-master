@@ -46,8 +46,22 @@ void xdSkinchanger()
 			SDK::CBaseWeapon* pWeapon = (SDK::CBaseWeapon*)pEntity;
 			int weapon = pWeapon->GetItemDefenitionIndex();
 
-			if(weapon == WEAPON_SSG08)
-				*pWeapon->FallbackPaintKit() = 624;
+			if (weapon == WEAPON_SSG08)
+			{
+				//*pWeapon->FallbackPaintKit() = 624;
+
+				switch (Config::SkinChanger::Knifes::get().ssg08_skin)
+				{
+				case 0: break;
+				case 1: *pWeapon->FallbackPaintKit() = 624; break;//dragon fire
+				case 2: *pWeapon->FallbackPaintKit() = 269; break;//fuskia
+				case 3: *pWeapon->FallbackPaintKit() = 102; break;//whiteout
+				case 4: *pWeapon->FallbackPaintKit() = 253; break;//acid fade
+				case 5: *pWeapon->FallbackPaintKit() = 409; break;//tiger thoot
+				case 6: *pWeapon->FallbackPaintKit() = 38; break;//fade
+				}
+
+			}				
 			else if (weapon == WEAPON_REVOLVER)
 				*pWeapon->FallbackPaintKit() = 701;
 			else if (weapon == WEAPON_SCAR20)
