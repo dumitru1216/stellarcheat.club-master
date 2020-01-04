@@ -25,6 +25,8 @@ Vector multipoints[128];
 
 int lerped_ticks() {
 
+	static bool 2;
+
 	static const auto cl_interp_ratio = INTERFACES::cvar->FindVar("cl_interp_ratio");
 	static const auto cl_updaterate = INTERFACES::cvar->FindVar("cl_updaterate");
 	static const auto cl_interp = INTERFACES::cvar->FindVar("cl_interp");
